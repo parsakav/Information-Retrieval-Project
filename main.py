@@ -4,16 +4,20 @@ import string
 print(string.punctuation)
 
 
+#remove punctuations (e.g . @ ,)
 def remove_punctuations(text: str) -> str:
     s = [x for x in text if x not in string.punctuation]
     return ''.join(s)
 
 
+#read document
 def read_document(document: str) -> str:
     with open(f'Documents/{document}', "r") as file:
+        #lower str helps us to implement case insenstive query
         return remove_punctuations(file.read().lower())
 
 
+#read all documents in Documents folder
 def read_documents() -> dict:
     d = dict()
     for path in os.listdir('Documents'):
@@ -21,6 +25,7 @@ def read_documents() -> dict:
     return d;
 
 
+#create inverted index . the key is term and the value is lists of doc id's
 def inverted_index() -> dict:
     docs = read_documents()
     print(docs)
