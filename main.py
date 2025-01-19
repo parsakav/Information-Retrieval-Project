@@ -1,5 +1,9 @@
+
 import os
+import re
 import string
+from collections import defaultdict
+from math import log
 
 print(string.punctuation)
 
@@ -28,7 +32,7 @@ def read_documents() -> dict:
 #create inverted index . the key is term and the value is lists of doc id's
 def inverted_index() -> dict:
     docs = read_documents()
-    print(docs)
+    
 
     invertedindex = dict()
     for x in docs:
@@ -42,4 +46,106 @@ def inverted_index() -> dict:
     return invertedindex
 
 
-print(inverted_index())
+
+
+
+
+#  Boolean Query Processing
+def boolean_query(inverted_index, query):
+    query = query.lower()
+    print("query:", query)
+    terms = query.split()
+    print("terms:", terms)
+    result = set()
+
+    if 'and' in terms:
+        terms.remove('and')
+        term1, term2 = terms
+        result = set(inverted_index.get(term1, [])) & set(inverted_index.get(term2, []))
+    elif 'or' in terms:
+        terms.remove('or')
+        term1, term2 = terms
+        result = set(inverted_index.get(term1, [])) | set(inverted_index.get(term2, []))
+    elif 'not' in terms:
+        terms.remove('not')
+        term1, term2 = terms
+        result = set(inverted_index.get(term1, [])) - set(inverted_index.get(term2, []))
+    else:
+        result = set(inverted_index.get(terms[0], []))
+
+  
+    return list(result)
+
+
+
+
+# Wildcard Search
+def wildcard_search(inverted_index, wildcard):
+    regex = re.compile(wildcard.replace('*', '.*').replace('?', '.'))
+    matching_terms = [term for term in inverted_index if regex.fullmatch(term)]
+    result = set()
+    for term in matching_terms:
+        result.update(inverted_index[term])
+    return list(result)
+
+
+
+
+def create_tfidf_index() -> dict:
+    docs = read_documents()
+    term_freqs = defaultdict(dict)  # term -> {doc: count}
+    doc_lengths = defaultdict(int)  # doc -> total words in doc
+
+    # Calculate term frequencies and document lengths
+    for doc, content in docs.items():
+        words = content.split()
+        doc_lengths[doc] = len(words)
+        for word in words:
+            term_freqs[word][doc] = term_freqs[word].get(doc, 0) + 1
+
+    # Calculate IDF values
+    total_docs = len(docs)
+    idf = {term: log(total_docs / len(doc_freqs)) for term, doc_freqs in term_freqs.items()}
+
+    # Create TF-IDF index
+    tfidf_index = defaultdict(dict)
+    for term, doc_freqs in term_freqs.items():
+        for doc, freq in doc_freqs.items():
+            tfidf = (freq / doc_lengths[doc]) * idf[term]  # TF-IDF formula
+            tfidf_index[term][doc] = tfidf
+
+    return tfidf_index
+
+
+#print(inverted_index())
+ 
+print("************************  Boolean Query Processing  ***********************************")
+print(boolean_query(inverted_index(),"swaying or pop"))
+print("************************  Wild Card  ***********************************")
+
+print(wildcard_search(inverted_index(),"*ing"))
+print(wildcard_search(inverted_index(),"shop*"))
+print(wildcard_search(inverted_index(),"*ppi*"))
+print(wildcard_search(inverted_index(),"sho*ng"))
+print(wildcard_search(inverted_index(),"mY*"))
+print("mm")
+print(wildcard_search(inverted_index(),"g?t"))
+
+
+print("************************  tfidf  ***********************************")
+
+#print(create_tfidf_index())
+print("************************  Boolean Query Processing  ***********************************")
+print(boolean_query(create_tfidf_index(),"swaying or pop"))
+print("************************  Wild Card  ***********************************")
+
+print(wildcard_search(create_tfidf_index(),"*ing"))
+print(wildcard_search(create_tfidf_index(),"shop*"))
+print(wildcard_search(create_tfidf_index(),"*ppi*"))
+print(wildcard_search(create_tfidf_index(),"sho*ng"))
+print(wildcard_search(create_tfidf_index(),"mY*"))
+print("mm")
+print(wildcard_search(create_tfidf_index(),"g?t"))
+
+
+
