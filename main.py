@@ -1,4 +1,3 @@
-
 import os
 import re
 import string
@@ -32,8 +31,6 @@ def read_documents() -> dict:
 #create inverted index . the key is term and the value is lists of doc id's
 def inverted_index() -> dict:
     docs = read_documents()
-    
-
     invertedindex = dict()
     for x in docs:
         l = docs[x].split()
@@ -44,10 +41,6 @@ def inverted_index() -> dict:
                 invertedindex[z] = {x}
 
     return invertedindex
-
-
-
-
 
 
 #  Boolean Query Processing
@@ -73,10 +66,7 @@ def boolean_query(inverted_index, query):
     else:
         result = set(inverted_index.get(terms[0], []))
 
-  
     return list(result)
-
-
 
 
 # Wildcard Search
@@ -87,8 +77,6 @@ def wildcard_search(inverted_index, wildcard):
     for term in matching_terms:
         result.update(inverted_index[term])
     return list(result)
-
-
 
 
 def create_tfidf_index() -> dict:
@@ -117,35 +105,56 @@ def create_tfidf_index() -> dict:
     return tfidf_index
 
 
+#implement multi operator boolean query
+def advanced_boolean_query(inverted_index, query):
+    print(f"query:{query}")
+    q = query.split()
+    results = set(boolean_query(inverted_index, f'{q[0]} {q[1]} {q[2]}'))
+    x = 3
+    while x < len(q):
+        if q[x] == 'and':
+            results = results & set(inverted_index.get(q[x], []))
+        elif q[x] == 'or':
+            results = results | set(inverted_index.get(q[x], []))
+        elif q[x] == 'not':
+            results = results - set(inverted_index.get(q[x], []))
+        x += 2
+    return results
+
+
 #print(inverted_index())
- 
+
 print("************************  Boolean Query Processing  ***********************************")
-print(boolean_query(inverted_index(),"swaying or pop"))
+print(boolean_query(inverted_index(), "swaying or pop"))
+print(boolean_query(inverted_index(), "swaying and pop"))
+print(boolean_query(inverted_index(), "swaying not pop"))
+print(boolean_query(inverted_index(), "weather or pop"))
+print(advanced_boolean_query(inverted_index(), "weather or pop or the"))
 print("************************  Wild Card  ***********************************")
 
-print(wildcard_search(inverted_index(),"*ing"))
-print(wildcard_search(inverted_index(),"shop*"))
-print(wildcard_search(inverted_index(),"*ppi*"))
-print(wildcard_search(inverted_index(),"sho*ng"))
-print(wildcard_search(inverted_index(),"mY*"))
+print(wildcard_search(inverted_index(), "*ing"))
+print(wildcard_search(inverted_index(), "shop*"))
+print(wildcard_search(inverted_index(), "*ppi*"))
+print(wildcard_search(inverted_index(), "sho*ng"))
+print(wildcard_search(inverted_index(), "mY*"))
 print("mm")
-print(wildcard_search(inverted_index(),"g?t"))
-
+print(wildcard_search(inverted_index(), "g?t"))
 
 print("************************  tfidf  ***********************************")
 
 #print(create_tfidf_index())
 print("************************  Boolean Query Processing  ***********************************")
-print(boolean_query(create_tfidf_index(),"swaying or pop"))
+print(boolean_query(create_tfidf_index(), "swaying or pop"))
 print("************************  Wild Card  ***********************************")
 
-print(wildcard_search(create_tfidf_index(),"*ing"))
-print(wildcard_search(create_tfidf_index(),"shop*"))
-print(wildcard_search(create_tfidf_index(),"*ppi*"))
-print(wildcard_search(create_tfidf_index(),"sho*ng"))
-print(wildcard_search(create_tfidf_index(),"mY*"))
+print(wildcard_search(create_tfidf_index(), "*ing"))
+print(wildcard_search(create_tfidf_index(), "shop*"))
+print(wildcard_search(create_tfidf_index(), "*ppi*"))
+print(wildcard_search(create_tfidf_index(), "sho*ng"))
+print(wildcard_search(create_tfidf_index(), "mY*"))
 print("mm")
-print(wildcard_search(create_tfidf_index(),"g?t"))
+print(wildcard_search(create_tfidf_index(), "g?t"))
 
+print(inverted_index())
 
-
+print(advanced_boolean_query(inverted_index(), 'x and z and y'))
