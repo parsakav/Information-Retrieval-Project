@@ -71,7 +71,7 @@ def boolean_query(inverted_index, query):
 
 # Wildcard Search
 def wildcard_search(inverted_index, wildcard):
-    regex = re.compile(wildcard.replace('*', '.*').replace('?', '.'))
+    regex = re.compile(wildcard.replace('*', '.*').replace('?', '.?'))
     matching_terms = [term for term in inverted_index if regex.fullmatch(term)]
     result = set()
     for term in matching_terms:
@@ -137,7 +137,6 @@ print(wildcard_search(inverted_index(), "shop*"))
 print(wildcard_search(inverted_index(), "*ppi*"))
 print(wildcard_search(inverted_index(), "sho*ng"))
 print(wildcard_search(inverted_index(), "mY*"))
-print("mm")
 print(wildcard_search(inverted_index(), "g?t"))
 
 print("************************  tfidf  ***********************************")
@@ -152,9 +151,6 @@ print(wildcard_search(create_tfidf_index(), "shop*"))
 print(wildcard_search(create_tfidf_index(), "*ppi*"))
 print(wildcard_search(create_tfidf_index(), "sho*ng"))
 print(wildcard_search(create_tfidf_index(), "mY*"))
-print("mm")
 print(wildcard_search(create_tfidf_index(), "g?t"))
 
-print(inverted_index())
 
-print(advanced_boolean_query(inverted_index(), 'x and z and y'))
