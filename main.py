@@ -43,6 +43,15 @@ def inverted_index() -> dict:
     return invertedindex
 
 
+def unary_not(inverted_index, query):
+    x = set()
+    for path in os.listdir('Documents'):
+        x.add(path)
+
+    negate, term1 = query.split()
+    return x - set(inverted_index.get(term1, []))
+
+
 #  Boolean Query Processing
 def boolean_query(inverted_index, query):
     query = query.lower()
@@ -153,4 +162,6 @@ print(wildcard_search(create_tfidf_index(), "sho*ng"))
 print(wildcard_search(create_tfidf_index(), "mY*"))
 print(wildcard_search(create_tfidf_index(), "g?t"))
 
-
+print("Unary not:")
+print(unary_not(inverted_index(),"not weather"))
+print(inverted_index()["weather"])
